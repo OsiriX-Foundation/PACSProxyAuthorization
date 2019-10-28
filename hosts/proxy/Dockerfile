@@ -60,8 +60,6 @@ RUN cd /root \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && rm -rf /root/ngx_openresty*
 
-#RUN apt-get update -y
-#RUN apt-get install -y lua-socket
 RUN cp /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.pem
 
 WORKDIR $NGINX_PREFIX/

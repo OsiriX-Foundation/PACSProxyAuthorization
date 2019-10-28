@@ -163,7 +163,7 @@ function M.auth(claim_specs, use_post_secret)
 
 
     --read privkey.pem
-    local file = '/opt/openresty/key/private.pem'
+    local file = '/run/secret/private.pem'
     local lines = lines_from(file)
 
     --extract content
@@ -188,14 +188,17 @@ function M.auth(claim_specs, use_post_secret)
 
     if res ~= nil then
        if res.body ~=nil then
-          local access_token=cjson.decode(res.body)
-          ngx.var.pacs_bearer_access_token="Bearer "..access_token["access_token"]
+          if res.status == 200 then
+             local access_token=cjson.decode(res.body)
+             ngx.var.pacs_bearer_access_token="Bearer "..access_token["access_token"]
+          else
+             ngx.exit(res.status)
+          end
        else 
-          ngx.log(ngx.WARN,"res is nil")--status + vérifier le code de retour
+          ngx.exit(ngx.UNKNOWN_ERROR)
        end
-       ngx.log(ngx.WARN,"status: "..res.status)--status
     else 
-       ngx.exit(ngx.HTTP_UNAUTHORIZED)--status
+       ngx.exit(ngx.UNKNOWN_ERROR)
     end
 
 
