@@ -1,6 +1,9 @@
 local jwt = require "resty.jwt"
 local cjson = require "cjson"
 local basexx = require "basexx"
+local http = require "resty.http"
+local cjson = require "cjson"
+
 local secret = os.getenv("JWT_SECRET")
 local post_secret = os.getenv("JWT_POST_SECRET")
 
@@ -14,9 +17,9 @@ assert(post_secret ~= nil, "Environment variable JWT_POST_SECRET not set")
 local M = {}
 
 function M.auth(claim_specs, use_post_secret)
-    -- require Authorization request header
 
-   local auth_header = ngx.var.http_Authorization
+    -- require Authorization request header
+    local auth_header = ngx.var.http_Authorization
     local token = nil
     local validation_secret = nil
     if auth_header ~= nil then
@@ -141,8 +144,88 @@ function M.auth(claim_specs, use_post_secret)
         end
     end
 
+
+
+    --get an access token for the google pacs
+    --JWT
+    header={}
+    header["typ"]="JWT"
+    header["alg"]="RS256"
+    payload={}
+    payload["iss"]="pacspep@kheopsdicomwebproject.iam.gserviceaccount.com"
+    payload["scope"]="https://www.googleapis.com/auth/cloud-platform"
+    payload["aud"]="https://oauth2.googleapis.com/token"
+    payload["iat"]=os.time(os.date("!*t"))
+    payload["exp"]=os.time(os.date("!*t"))+1000
+    table_of_jwt = {}
+    table_of_jwt["header"]=header
+    table_of_jwt["payload"]=payload
+
+
+    --read privkey.pem
+    local file = '/opt/openresty/key/private.pem'
+    local lines = lines_from(file)
+
+    --extract content
+    local key=""
+    for k,v in pairs(lines) do
+       key=key..v.."\n"
+    end
+
+    --sign the jwt with the privkey
+    local jwt_token = jwt:sign(key, table_of_jwt)
+    ngx.log(ngx.WARN,jwt_token)
+
+    --Get an access token for the google pacs
+    local httpc = http.new()
+    httpc:set_proxy_options(proxy_options)
+    local res, err =httpc:request_uri("https://oauth2.googleapis.com/token", {
+                    method="POST", 
+                    keepalive=false, 
+                    body="grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion="..jwt_token,
+                    headers={["Content-Type"]="application/x-www-form-urlencoded"}
+                 })
+
+    if res ~= nil then
+       if res.body ~=nil then
+          local access_token=cjson.decode(res.body)
+          ngx.var.pacs_bearer_access_token="Bearer "..access_token["access_token"]
+       else 
+          ngx.log(ngx.WARN,"res is nil")--status + vérifier le code de retour
+       end
+       ngx.log(ngx.WARN,"status: "..res.status)--status
+    else 
+       ngx.exit(ngx.HTTP_UNAUTHORIZED)--status
+    end
+
+
     -- write the X-Auth-UserId header
     ngx.header["X-Auth-UserId"] = jwt_obj.payload.sub
 end
 
+-- see if the file exists
+function file_exists(file)
+  local f = io.open(file, "rb")
+  if f then f:close() end
+  return f ~= nil
+end
+
+-- get all lines from a file, returns an empty 
+-- list/table if the file does not exist
+function lines_from(file)
+  if not file_exists(file) then return {} end
+  lines = {}
+  for line in io.lines(file) do 
+    lines[#lines + 1] = line
+  end
+  return lines
+end
+
+
 return M
+
+
+
+
+
+

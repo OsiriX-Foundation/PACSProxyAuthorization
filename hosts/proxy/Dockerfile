@@ -1,5 +1,6 @@
 FROM ubuntu:14.04.2
 
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     curl perl make build-essential procps ca-certificates\
@@ -59,10 +60,18 @@ RUN cd /root \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && rm -rf /root/ngx_openresty*
 
+#RUN apt-get update -y
+#RUN apt-get install -y lua-socket
+RUN cp /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.pem
+
 WORKDIR $NGINX_PREFIX/
 
 RUN rm -rf conf/* html/*
 COPY default/nginx $NGINX_PREFIX/
+
+COPY default/http.lua $OPENRESTY_PREFIX/lualib/resty
+COPY default/http_headers.lua $OPENRESTY_PREFIX/lualib/resty
+COPY pacspep_keys/key $OPENRESTY_PREFIX/key/private.pem
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
