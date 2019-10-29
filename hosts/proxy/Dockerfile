@@ -69,7 +69,6 @@ COPY default/nginx $NGINX_PREFIX/
 
 COPY default/http.lua $OPENRESTY_PREFIX/lualib/resty
 COPY default/http_headers.lua $OPENRESTY_PREFIX/lualib/resty
-COPY pacspep_keys/key $OPENRESTY_PREFIX/key/private.pem
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
