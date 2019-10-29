@@ -195,10 +195,10 @@ function M.auth(claim_specs, use_post_secret)
              ngx.exit(res.status)
           end
        else 
-          ngx.exit(ngx.UNKNOWN_ERROR)
+          ngx.exit(ngx.HTTP_UNKNOWN_ERROR)
        end
     else 
-       ngx.exit(ngx.UNKNOWN_ERROR)
+       ngx.exit(ngx.HTTP_UNKNOWN_ERROR)
     end
 
 
