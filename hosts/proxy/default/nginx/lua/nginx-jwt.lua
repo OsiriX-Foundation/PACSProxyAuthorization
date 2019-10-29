@@ -155,7 +155,7 @@ function M.auth(claim_specs, use_post_secret)
     payload["iss"]="pacspep@kheopsdicomwebproject.iam.gserviceaccount.com"
     payload["scope"]="https://www.googleapis.com/auth/cloud-platform"
     payload["aud"]="https://oauth2.googleapis.com/token"
-    payload["iat"]=os.time(os.date("!*t"))
+    payload["iat"]=os.time(os.date("!*t"))-50
     payload["exp"]=os.time(os.date("!*t"))+1000
     table_of_jwt = {}
     table_of_jwt["header"]=header
