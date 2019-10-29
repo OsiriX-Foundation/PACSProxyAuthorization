@@ -192,13 +192,17 @@ function M.auth(claim_specs, use_post_secret)
              local access_token=cjson.decode(res.body)
              ngx.var.pacs_bearer_access_token="Bearer "..access_token["access_token"]
           else
+             ngx.log(ngx.WARN,"body: "..res.body)
+             ngx.log(ngx.WARN,"status: "..res.status)
              ngx.exit(res.status)
           end
        else 
-          ngx.exit(ngx.HTTP_UNKNOWN_ERROR)
+          ngx.log(ngx.WARN,"status: "..res.status)
+          ngx.exit(ngx.HTTP_UNAUTHORIZED)
        end
     else 
-       ngx.exit(ngx.HTTP_UNKNOWN_ERROR)
+       ngx.log(ngx.WARN,"err: "..err)
+       ngx.exit(ngx.HTTP_UNAUTHORIZED)
     end
 
 
