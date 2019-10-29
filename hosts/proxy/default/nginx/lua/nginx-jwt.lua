@@ -160,6 +160,9 @@ function M.auth(claim_specs, use_post_secret)
     table_of_jwt = {}
     table_of_jwt["header"]=header
     table_of_jwt["payload"]=payload
+   
+    ngx.log(ngx.WARN,"iat: "..payload["iat"])
+    ngx.log(ngx.WARN,"exp: "..payload["exp"])
 
 
     --read privkey.pem
