@@ -171,7 +171,7 @@ function M.auth(claim_specs, use_post_secret)
     for k,v in pairs(lines) do
        key=key..v.."\n"
     end
-
+    ngx.log(ngx.WARN,"key: "..key)
     --sign the jwt with the privkey
     local jwt_token = jwt:sign(key, table_of_jwt)
     ngx.log(ngx.WARN,jwt_token)
