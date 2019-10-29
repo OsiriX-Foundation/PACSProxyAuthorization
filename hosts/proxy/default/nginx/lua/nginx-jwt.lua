@@ -163,7 +163,7 @@ function M.auth(claim_specs, use_post_secret)
 
 
     --read privkey.pem
-    local file = '/run/secret/private.pem'
+    local file = '/run/secrets/private.pem'
     local lines = lines_from(file)
 
     --extract content
