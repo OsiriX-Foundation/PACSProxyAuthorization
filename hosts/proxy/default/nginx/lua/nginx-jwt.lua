@@ -194,6 +194,8 @@ function M.auth(claim_specs, use_post_secret)
           if res.status == 200 then
              local access_token=cjson.decode(res.body)
              ngx.var.pacs_bearer_access_token="Bearer "..access_token["access_token"]
+             ngx.log(ngx.WARN,"YEAH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+             ngx.log(ngx.WARN,"access_token: "..access_token["access_token"])
           else
              ngx.log(ngx.WARN,"body: "..res.body)
              ngx.log(ngx.WARN,"status: "..res.status)
