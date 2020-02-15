@@ -152,7 +152,7 @@ function M.auth(claim_specs, use_post_secret)
     header["typ"]="JWT"
     header["alg"]="RS256"
     payload={}
-    payload["iss"]="pacspep@kheopsdicomwebproject.iam.gserviceaccount.com"
+    payload["iss"]=os.getenv("DICOM_SERVICE_ACCOUNT_USER")
     payload["scope"]="https://www.googleapis.com/auth/cloud-platform"
     payload["aud"]="https://oauth2.googleapis.com/token"
     payload["iat"]=os.time(os.date("!*t")) - 60
