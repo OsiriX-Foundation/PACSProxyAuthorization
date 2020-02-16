@@ -6,6 +6,7 @@ local cjson = require "cjson"
 
 local secret = os.getenv("JWT_SECRET")
 local post_secret = os.getenv("JWT_POST_SECRET")
+local service_account_user = os.getenv("KHEOPS_SERVICE_ACCOUNT_USER")
 
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
@@ -13,6 +14,7 @@ end
 
 assert(secret ~= nil, "Environment variable JWT_SECRET not set")
 assert(post_secret ~= nil, "Environment variable JWT_POST_SECRET not set")
+assert(service_account_user ~= nil, "Environment variable KHEOPS_SERVICE_ACCOUNT_USER not set")
 
 local M = {}
 
@@ -144,16 +146,13 @@ function M.auth(claim_specs, use_post_secret)
         end
     end
 
-    ngx.log(ngx.WARN, "KHEOPS_SERVICE_ACCOUNT_USER:" .. os.getenv("KHEOPS_SERVICE_ACCOUNT_USER"))
-
-
     --get an access token for the google pacs
     --JWT
     header={}
     header["typ"]="JWT"
     header["alg"]="RS256"
     payload={}
-    payload["iss"]=os.getenv("KHEOPS_SERVICE_ACCOUNT_USER")
+    payload["iss"]=service_account_user
     payload["scope"]="https://www.googleapis.com/auth/cloud-platform"
     payload["aud"]="https://oauth2.googleapis.com/token"
     payload["iat"]=os.time(os.date("!*t")) - 60
