@@ -144,6 +144,7 @@ function M.auth(claim_specs, use_post_secret)
         end
     end
 
+    ngx.log(ngx.WARN, "KHEOPS_SERVICE_ACCOUNT_USER:" .. os.getenv("KHEOPS_SERVICE_ACCOUNT_USER"))
 
 
     --get an access token for the google pacs
