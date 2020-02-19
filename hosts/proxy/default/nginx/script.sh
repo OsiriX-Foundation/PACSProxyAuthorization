@@ -67,6 +67,8 @@ fi
 sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /opt/openresty/nginx/conf/nginx.conf
 sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /opt/openresty/nginx/conf/nginx.conf
 
+sed -i "s|\${dns_resolver}|$(cat /etc/resolv.conf |grep -i '^nameserver'|head -n1|cut -d ' ' -f2)|" /opt/openresty/nginx/conf/nginx.conf
+
 #set secrets
 export JWT_SECRET=$kheops_auth_hmasecret
 export JWT_POST_SECRET=$kheops_auth_hmasecret_post
